@@ -31,7 +31,7 @@
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
         "post-package-install": [
-            "@php artisan vendor:publish --provider=\"WpStarter\\Flow\\FlowServiceProvider\" --tag=\"config\""
+            "WpStarter\\Flow\\Support\\FlowInstaller::publishConfig"
         ]
     },
     "extra": {
