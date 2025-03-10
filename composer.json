@@ -1,0 +1,54 @@
+{
+    "name": "wpstarter/flow",
+    "description": "Flow package for WPStarter",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "WpStarter\\Flow\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WpStarter\\Flow\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "WPStarter",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-arch": "^2.0"
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "post-package-install": [
+            "@php artisan vendor:publish --provider=\"WpStarter\\Flow\\FlowServiceProvider\" --tag=\"config\""
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "WpStarter\\Flow\\FlowServiceProviderLaravel"
+            ]
+        },
+        "wpstater": {
+            "providers": [
+                "WpStarter\\Flow\\FlowServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
