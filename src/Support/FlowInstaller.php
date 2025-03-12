@@ -9,15 +9,11 @@ class FlowInstaller
     {
         if (class_exists('Illuminate\Support\Facades\Artisan')) {
             \Illuminate\Support\Facades\Artisan::call('vendor:publish', [
-                '--provider' => 'WpStarter\Flow\FlowServiceProvider',
-                '--tag' => 'config',
-                '--force' => false
+                '--tag' => 'flow-config',
             ]);
         }elseif (class_exists('WpStarter\Support\Facades\Artisan')) {
             \WpStarter\Support\Facades\Artisan::call('vendor:publish', [
-                '--provider' => 'WpStarter\Flow\FlowServiceProvider',
-                '--tag' => 'config',
-                '--force' => false
+                '--tag' => 'flow-config',
             ]);
         }
     }

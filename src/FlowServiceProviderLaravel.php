@@ -18,7 +18,7 @@ class FlowServiceProviderLaravel extends ServiceProvider
     {
         $config = __DIR__.'/../config/flow.php';
 
-        $this->publishes([$config => base_path('config/flow.php')], ['flow', 'flow:config']);
+        $this->publishes([$config => base_path('config/flow.php')], ['flow-config', 'flow:config']);
 
         $this->mergeConfigFrom($config, 'flow');
     }
