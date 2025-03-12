@@ -3,7 +3,7 @@
 namespace WpStarter\Flow;
 
 use Illuminate\Support\ServiceProvider;
-class FlowServiceProviderLaravel
+class FlowServiceProviderLaravel extends ServiceProvider
 {
     public function register(): void
     {
