@@ -17,7 +17,7 @@ composer require wpstarter/flow
 ## Configuration
 You can publish the configuration file using:
 ```bash
-php artisan vendor:publish --provider="WpStarter\Flow\FlowServiceProvider"
+php artisan vendor:publish --tag=flow-config
 ```
 
 ## Usage

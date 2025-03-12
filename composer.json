@@ -1,6 +1,6 @@
 {
     "name": "wpstarter/flow",
-    "description": "Flow package for WPStarter",
+    "description": "A library for handling workflow automation and process management seamlessly.",
     "type": "library",
     "license": "MIT",
     "autoload": {
