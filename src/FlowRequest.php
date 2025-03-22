@@ -83,7 +83,9 @@ class FlowRequest implements \ArrayAccess
 
     public function parseArguments($argNames=[]){
         $this->arguments=[];
-        $arguments = explode(' ', $this->getMessage());
+        $arguments = explode(' ', trim($this->getMessage()));
+        //First arguments is command, shift it off
+        array_shift($arguments);
         $options=$numericArguments=$queryArguments=[];
         foreach ($arguments as $argument){
             if(substr($argument,0,1)=='-' && strpos($argument,'=')!==false){
@@ -119,8 +121,15 @@ class FlowRequest implements \ArrayAccess
         }
         return $this->arguments;
     }
-    public function getArgument($name){
-        return $this->getArguments()[$name] ?? null;
+    public function getArgument($name=null){
+        $arguments=$this->getArguments();
+        if($name===null){
+            return array_shift($arguments);
+        }
+        return $arguments[$name]??null;
+    }
+    public function argument($name=null){
+        return $this->getArgument($name);
     }
 
 
