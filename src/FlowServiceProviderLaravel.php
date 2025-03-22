@@ -10,6 +10,10 @@ class FlowServiceProviderLaravel extends ServiceProvider
         $this->registerManager();
         $this->registerConfig();
     }
+    function boot(FlowManager $manager){
+        $manager->configureLaravel();
+        $manager->register(config('flow.providers'));
+    }
     protected function registerManager(){
         $this->app->singleton(FlowManager::class);
         $this->app->alias(FlowManager::class, 'flow.manager');
