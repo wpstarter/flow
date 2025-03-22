@@ -10,6 +10,11 @@ class FlowRequest implements \ArrayAccess
     protected $data = [];
     protected $resolved = [];
 
+    protected $arguments = [];
+
+    protected $argumentNames=[];
+    protected $argumentsParsed=false;
+
     public function __construct($data = [])
     {
         foreach ($data as $key => $value) {
@@ -74,6 +79,48 @@ class FlowRequest implements \ArrayAccess
             }
         }
         return $this->resolved['message'] ?? null;
+    }
+
+    public function parseArguments($argNames=[]){
+        $this->arguments=[];
+        $arguments = explode(' ', $this->getMessage());
+        $options=$numericArguments=$queryArguments=[];
+        foreach ($arguments as $argument){
+            if(substr($argument,0,1)=='-' && strpos($argument,'=')!==false){
+                $options[]=$argument;
+            }elseif(strpos($argument,'=')!==false){
+                $queryArguments[]=$argument;
+            }else{
+                $numericArguments[]=$argument;
+            }
+        }
+        //Parse options from --k=v or --k="v" into array
+        foreach($options as $option){
+            $option=explode('=',ltrim($option,'-'));
+            $this->arguments[$option[0]]=trim($option[1],'"');
+        }
+        foreach ($queryArguments as $argument){
+            parse_str($argument,$parsedQueryArguments);
+            $this->arguments=array_merge($this->arguments,$parsedQueryArguments);
+        }
+        foreach ($argNames as $argName){
+            $this->arguments[$argName]=array_shift($numericArguments);
+        }
+        $numericArguments=array_values($numericArguments);
+        foreach ($numericArguments as $index=>$value){
+            $this->arguments[$index]=$value;
+        }
+        $this->argumentsParsed=true;
+    }
+
+    public function getArguments(){
+        if(!$this->argumentsParsed){
+            $this->parseArguments(is_array($this->argumentNames)?$this->argumentNames:explode(' ',$this->argumentNames));
+        }
+        return $this->arguments;
+    }
+    public function getArgument($name){
+        return $this->getArguments()[$name] ?? null;
     }
 
 
