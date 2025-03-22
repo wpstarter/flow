@@ -140,8 +140,8 @@ class FlowManager
             }
         }
         foreach ($this->flows as $flow) {
-            if ($flow->getRoute()) {
-                $this->router->add($flow->getRoute(), $flow);
+            if ($route=$flow->getRoute()) {
+                $this->router->add($route, $flow);
             }
         }
     }
