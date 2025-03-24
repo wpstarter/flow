@@ -46,7 +46,9 @@ class FlowCollection implements \IteratorAggregate
                 $flow = $flow();
             }
             if ($flow instanceof Flow) {
-                $flow->setFlows($this);
+                $flow->setFlowsResolver(function(){
+                    return $this;
+                });
                 $flow->setSessionKey($this->sessionKey);
                 $registerKey = Helper::getFlowUniqueId($flow);
                 $duplicated = $this->flows[$registerKey] ?? null;
@@ -219,7 +221,16 @@ class FlowCollection implements \IteratorAggregate
         $this->reset($flow);
         return $this;
     }
-
+    public function goTo($toFlow, $ttl = null): FlowCollection
+    {
+        $flow = $this->find($toFlow);
+        if ($flow) {
+            $this->setState($flow, $ttl);
+        } else {
+            throw new \RuntimeException('Flow ' . $toFlow . ' not found');
+        }
+        return $this;
+    }
     public function back($default = null, $ttl = null)
     {
         $previousFlowID = $this->registry->previousFlowId();

@@ -2,21 +2,23 @@
 
 namespace WpStarter\Flow;
 
+use Closure;
 use RuntimeException;
 use WpStarter\Flow\State\FlowData;
 use WpStarter\Flow\Support\Helper;
 
 abstract class Flow
 {
+    public $channel;
     protected $id;
     /**
      * @var string|array match key if specified
      */
     protected $route;
     /**
-     * @var FlowCollection|Flow[]
+     * @var Closure
      */
-    protected $flows;
+    protected Closure $flowsResolver;
     protected FlowData $state;
     protected FlowRequest $request;
     protected string $sessionKey;
@@ -105,21 +107,17 @@ abstract class Flow
      */
     function redirect($to, $ttl = null): Flow
     {
-        $flow = $this->flows->find($to);
-        if ($flow) {
-            $this->getFlows()->setState($flow, $ttl);
-        } else {
-            throw new RuntimeException('Flow ' . $to . ' not found');
-        }
+        $this->getFlows()->goTo($to, $ttl);
         return $this;
     }
-    function redirectToDefault(){
+    function redirectToDefault()
+    {
         $this->getFlows()->resetState();
     }
 
-    function back($default = null)
+    function back($default = null, $ttl = null)
     {
-        $this->getFlows()->back($default);
+        $this->getFlows()->back($default, $ttl);
     }
 
     function dispatchTo($flow)
@@ -127,15 +125,15 @@ abstract class Flow
         return $this->getFlows()->resolve($flow)->dispatch($this->request);
     }
 
-    function setFlows(FlowCollection $collection): Flow
+    function setFlowsResolver($resolver): Flow
     {
-        $this->flows = $collection;
+        $this->flowsResolver = $resolver;
         return $this;
     }
 
-    function getFlows()
+    function getFlows() : FlowCollection
     {
-        return $this->flows;
+        return call_user_func($this->flowsResolver, $this);
     }
 
     function isCurrent(): bool

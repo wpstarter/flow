@@ -42,20 +42,22 @@ class FlowRouter
         return $this;
     }
 
-    public function add($route, $flow): FlowRouter
+    public function add($route, $flow, $channel='public'): FlowRouter
     {
+        $channel = Helper::getFlowChannel($channel);
         $flow = Helper::getFlowUniqueId($flow);
         if ($route && $flow) {
-            $this->routes[] = compact('route', 'flow');
+            $this->routes[] = compact('route', 'flow', 'channel');
         }
         return $this;
     }
 
-    public function prepend($route, $flow): FlowRouter
+    public function prepend($route, $flow, $channel='public'): FlowRouter
     {
+        $channel = Helper::getFlowChannel($channel);
         $flow = Helper::getFlowUniqueId($flow);
         if ($route && $flow) {
-            array_unshift($this->routes, compact('route', 'flow'));
+            array_unshift($this->routes, compact('route', 'flow', 'channel'));
         }
         return $this;
     }
@@ -71,7 +73,7 @@ class FlowRouter
                 }
             } else {
                 foreach ($this->matchers as $matcher) {
-                    if ($matcher->match($request, $route['route'])) {
+                    if ($matcher->match($request, $route)) {
                         $matchedFlow = $route['flow'];
                         break 2;
                     }

@@ -4,7 +4,7 @@ namespace WpStarter\Flow;
 
 class FlowRequest implements \ArrayAccess
 {
-
+    public string $channel='public';
     protected $idResolver = 'id';
     protected $messageResolver = 'message';
     protected $data = [];
