@@ -42,9 +42,9 @@ class FlowRouter
         return $this;
     }
 
-    public function add($route, $flow, $channel='public'): FlowRouter
+    public function add($route, $flow, $channel=null): FlowRouter
     {
-        $channel = Helper::getFlowChannel($channel);
+        $channel = $channel ?? Helper::getFlowChannel($flow);
         $flow = Helper::getFlowUniqueId($flow);
         if ($route && $flow) {
             $this->routes[] = compact('route', 'flow', 'channel');
@@ -52,9 +52,9 @@ class FlowRouter
         return $this;
     }
 
-    public function prepend($route, $flow, $channel='public'): FlowRouter
+    public function prepend($route, $flow, $channel=null): FlowRouter
     {
-        $channel = Helper::getFlowChannel($channel);
+        $channel = $channel ?? Helper::getFlowChannel($flow);
         $flow = Helper::getFlowUniqueId($flow);
         if ($route && $flow) {
             array_unshift($this->routes, compact('route', 'flow', 'channel'));

@@ -61,11 +61,11 @@ class Helper
         }
         return $flow;
     }
-    public static function getFlowChannel($flow,$default=null){
+    public static function getFlowChannel($flow){
         if($flow instanceof Flow){
             return $flow->channel;
         }
-        return $default;
+        return null;
     }
 
 }
