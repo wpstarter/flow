@@ -7,6 +7,7 @@ use WpStarter\Flow\State\ArrayStore;
 use WpStarter\Flow\State\FlowData;
 use WpStarter\Flow\State\FlowRegistry;
 use WpStarter\Flow\State\LaravelStore;
+use WpStarter\Flow\State\StatelessFlow;
 use WpStarter\Flow\State\WpStarterStore;
 use WpStarter\Flow\Support\Facades\Facade;
 use WpStarter\Flow\Support\FlowProvider;
@@ -70,11 +71,15 @@ class FlowManager
         $this->registerRoutes();
         $matchedRoute = $this->router->match($request);
         if ($matchedRoute) {
-            $this->flows->setState($matchedRoute->flow);
+            $flow=$this->flows->find($matchedRoute->flow);
+            if(! $flow instanceof StatelessFlow){
+                $this->flows->setState($matchedRoute->flow);
+            }
         }else{
+            $flow = $this->flows->current();
             $matchedRoute=new FlowRoute(['route'=>null, 'flow'=>null, 'channel'=>null, 'middleware'=>null]);
         }
-        if ($flow = $this->flows->current()) {
+        if ($flow) {
             try {
                 $response=$matchedRoute->run($flow, $request);
             } catch (ResponseException $exception) {
