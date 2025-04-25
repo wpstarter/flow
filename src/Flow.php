@@ -22,6 +22,7 @@ abstract class Flow
     protected FlowData $state;
     protected FlowRequest $request;
     protected string $sessionKey;
+    protected array $middleware=[];
 
     public function __construct($id = null)
     {
@@ -144,5 +145,9 @@ abstract class Flow
     public function getRoute()
     {
         return $this->route;
+    }
+    public function getMiddleware(): array
+    {
+        return $this->middleware;
     }
 } 

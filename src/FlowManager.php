@@ -10,6 +10,7 @@ use WpStarter\Flow\State\LaravelStore;
 use WpStarter\Flow\State\WpStarterStore;
 use WpStarter\Flow\Support\Facades\Facade;
 use WpStarter\Flow\Support\FlowProvider;
+use WpStarter\Flow\Support\Helper;
 use WpStarter\Flow\Support\MessageMatcher;
 
 class FlowManager
@@ -63,16 +64,19 @@ class FlowManager
         $this->request = $request;
         $requestId=$request->getIdentifier();
         $this->flows = FlowCollection::forSession($this->managerId?$this->managerId.':'.$requestId:$requestId);
+        $this->router->flows($this->flows);
         $this->maybeResetState();
         $this->registerFlows($request);
         $this->registerRoutes();
-        $matched = $this->router->flows($this->flows)->match($request);
-        if ($matched) {
-            $this->flows->setState($matched);
+        $matchedRoute = $this->router->match($request);
+        if ($matchedRoute) {
+            $this->flows->setState($matchedRoute->flow);
+        }else{
+            $matchedRoute=new FlowRoute(['route'=>null, 'flow'=>null, 'channel'=>null, 'middleware'=>null]);
         }
         if ($flow = $this->flows->current()) {
             try {
-                $response = $flow->dispatch($request);
+                $response=$matchedRoute->run($flow, $request);
             } catch (ResponseException $exception) {
                 $response = $exception->getResponse();
             }

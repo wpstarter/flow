@@ -2,6 +2,7 @@
 
 namespace WpStarter\Flow;
 
+use PHPUnit\TextUI\Help;
 use WpStarter\Flow\Support\Helper;
 use WpStarter\Flow\Support\Matcher;
 
@@ -11,12 +12,19 @@ class FlowRouter
      * @var FlowCollection
      */
     protected FlowCollection $flows;
-
+    /**
+     * @var FlowRoute[]
+     */
     protected array $routes = [];
     /**
      * @var Matcher[]
      */
     protected array $matchers = [];
+    /**
+     * Global middlewares
+     * @var array
+     */
+    protected array $middleware=[];
 
     public function __construct($matchers = [])
     {
@@ -27,6 +35,21 @@ class FlowRouter
     {
         $this->flows = $flows;
         return $this;
+    }
+
+    public function middleware(...$middleware): FlowRouter
+    {
+        $this->middleware = Helper::mergeMiddlewares($this->middleware, ...$middleware);
+        return $this;
+    }
+    public function setMiddleware($middleware): FlowRouter
+    {
+        $this->middleware = $middleware;
+        return $this;
+    }
+    public function getMiddleware(): array
+    {
+        return $this->middleware;
     }
 
     public function addMatcher(...$matchers): FlowRouter
@@ -42,44 +65,54 @@ class FlowRouter
         return $this;
     }
 
-    public function add($route, $flow, $channel=null): FlowRouter
+    public function add($route, $flow, $channel=null, $middleware=null, $prepend=false): FlowRouter
     {
+        if(is_string($flow)){
+            if(!$this->flows->find($flow)) {
+                $this->flows->register($flow);
+            }
+            $flow=$this->flows->find($flow);
+        }
         $channel = $channel ?? Helper::getFlowChannel($flow);
-        $flow = Helper::getFlowUniqueId($flow);
-        if ($route && $flow) {
-            $this->routes[] = compact('route', 'flow', 'channel');
+        $flowId = Helper::getFlowUniqueId($flow);
+        if ($route && $flowId) {
+            $route=new FlowRoute(['route'=>$route, 'flow'=>$flowId, 'channel'=>$channel, 'middleware'=>$middleware]);;
+            if($prepend){
+                array_unshift($this->routes, $route);
+            }else {
+                $this->routes[] = $route;
+            }
         }
         return $this;
     }
 
-    public function prepend($route, $flow, $channel=null): FlowRouter
+    public function prepend($route, $flow, $channel=null, $middleware=null): FlowRouter
     {
-        $channel = $channel ?? Helper::getFlowChannel($flow);
-        $flow = Helper::getFlowUniqueId($flow);
-        if ($route && $flow) {
-            array_unshift($this->routes, compact('route', 'flow', 'channel'));
-        }
-        return $this;
+        return $this->add($route, $flow, $channel, $middleware, true);
     }
 
+    /**
+     * @param FlowRequest $request
+     * @return FlowRoute|null
+     */
     public function match(FlowRequest $request)
     {
-        $matchedFlow = null;
+        $matchedRoute = null;
         foreach ($this->routes as $route) {
             if ($route['route'] instanceof \Closure) {
                 if ($route['route']($request)) {
-                    $matchedFlow = $route['flow'];
+                    $matchedRoute = $route;
                     break;
                 }
             } else {
                 foreach ($this->matchers as $matcher) {
                     if ($matcher->match($request, $route)) {
-                        $matchedFlow = $route['flow'];
+                        $matchedRoute = $route;
                         break 2;
                     }
                 }
             }
         }
-        return $matchedFlow;
+        return $matchedRoute;
     }
 }

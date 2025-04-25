@@ -67,5 +67,20 @@ class Helper
         }
         return null;
     }
+    public static function mergeMiddlewares(...$middlewares)
+    {
+        $merged = [];
+        foreach ($middlewares as $middleware) {
+            if(empty($middleware)){
+                continue;
+            }
+            if (is_array($middleware)) {
+                $merged = array_merge($merged, $middleware);
+            } else {
+                $merged[] = $middleware;
+            }
+        }
+        return array_unique($merged);
+    }
 
 }
