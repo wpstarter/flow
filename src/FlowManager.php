@@ -71,7 +71,7 @@ class FlowManager
         $this->registerRoutes();
         $matchedRoute = $this->router->match($request);
         if ($matchedRoute) {
-            $flow=$this->flows->find($matchedRoute->flow);
+            $flow=$this->flows->resolve($matchedRoute->flow);
             if(! $flow instanceof StatelessFlow){
                 $this->flows->setState($matchedRoute->flow);
             }
